@@ -81,7 +81,7 @@ class player():
     def __init__(self, baralho, oponente=None, epsilon = 0.1, rltw = None, rltl = None, rltwq = None, rltlq = None, tipo = 0, utipo = 0):
 
         self.mao = mao()
-        self.type = tipo #0: para de comprar com 14 ou mais, 1: Greedy, 2: RL, 3: Humano
+        self.tipo = tipo #0: para de comprar com 14 ou mais, 1: Greedy, 2: RL, 3: Humano
         self.utipo = utipo #0: Olha apenas para a própria mão, #1: Olha apenas para vitórias e derrotas, 2: Olha ambos
         self.resultados = {'v':0,'e':0,'d':0}     
         self.baralho = baralho
@@ -101,11 +101,11 @@ class player():
         
 
     def tomar_dec(self):
-        if self.type == 0:
+        if self.tipo == 0:
             self.dec_14()
-        elif self.type == 1:
+        elif self.tipo == 1:
             self.dec_greedy()
-        elif self.type == 2:
+        elif self.tipo == 2:
             self.dec_egreedy()
 
     def dec_14(self):
@@ -118,27 +118,29 @@ class player():
         else:
             self.last_mv = 0
 
-    def dec_greedy():
+    def dec_greedy(self):
         total = self.mao.get_total()
         self.last_t = total
-        o_card = oponente.get_card()
-        dec = [self.rltw[total,o_card],self.rltl[total,o_card]]
+        o_card = self.oponente.get_card()
         if total <=21:
+            dec = [self.rltw[total,o_card],self.rltl[total,o_card]]
             if dec[0]<dec[1]:
                 nova_carta = self.baralho.comprar()
                 self.mao.add_card(nova_carta)
                 self.last_mv = 1
             else:
                 self.last_mv = 0
+        else:
+            self.last_mv = 0
         
 
-    def dec_egreedy():
+    def dec_egreedy(self):
         total = self.mao.get_total()
         self.last_t = total
-        o_card = oponente.get_card()
-        dec = [self.rltw[total,o_card],self.rltl[total,o_card]]
+        o_card = self.oponente.get_card()
         if total<=21:
-            if np.random.rand <= self.epsilon:
+            dec = [self.rltw[total,o_card],self.rltl[total,o_card]]
+            if np.random.rand() <= self.epsilon:
                 if dec[0]>=dec[1]:
                     nova_carta = self.baralho.comprar()
                     self.mao.add_card(nova_carta)
@@ -147,32 +149,28 @@ class player():
                     self.last_mv = 0
             else:
                 self.dec_greedy()
+        else:
+            self.last_mv = 0
 
     def get_card(self):
         try:
-            return self.mao[0].get_valor()
+            return self.mao.cartas[0].get_valor()
         except:
             print("Sem cartas na mão")
 
     def update(self):
         if self.tipo not in [0,3]:
-            o_card = oponente.get_card()
-            if utipo == 0:
-                Q = self.mao.get_total() - 21
+            o_card = self.oponente.get_card()
+            total = self.last_t
+            if self.utipo == 0:
+                Q = 21 - self.mao.get_total() 
                 if Q < 0:
                     Q = 21
                 if self.last_mv:
                     self.rltwq[total,o_card]+=1
                     self.rltw[total,o_card]+= (Q - self.rltw[total,o_card])/self.rltwq[total,o_card]
                     
-                    
-            
-                
-            
-                
-                
-                
-            
+    
 
     def reset_mao(self):
         #del self.mao
