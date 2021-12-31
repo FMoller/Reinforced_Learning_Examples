@@ -169,6 +169,23 @@ class player():
                 if self.last_mv:
                     self.rltwq[total,o_card]+=1
                     self.rltw[total,o_card]+= (Q - self.rltw[total,o_card])/self.rltwq[total,o_card]
+            elif self.utipo == 1:
+                if total <= 21:
+                    self.tracking.append((total,o_card,self.last_mv))
+
+    def f_update(self,Q):
+        if self.utipo == 1:
+            for i in self.tracking:
+                o_card = i[1]
+                total = i[0]
+                if i[2]:
+                    self.rltwq[total,o_card]+=1
+                    self.rltw[total,o_card]+= (Q - self.rltw[total,o_card])/self.rltwq[total,o_card]
+                else:
+                    self.rltlq[total,o_card]+=1
+                    self.rltl[total,o_card]+= (Q - self.rltl[total,o_card])/self.rltlq[total,o_card]
+        self.tracking = []
+                    
                     
     
 
