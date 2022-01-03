@@ -1,11 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-politicas_rl = np.zeros((3**9,9))
-politicas_rlq = np.zeros((3**9,9))
 
-politicas_gd = np.zeros((3**9,9))
-politicas_gdq = np.zeros((3**9,9))
 base3 = []
 for i in range(9):
     base3.append([3**i])
@@ -140,19 +136,34 @@ def campeonato(jogos):
         
     
         
-tempo = 100    
-placar = np.zeros((tempo,3))
-for i in range(1,tempo):
-    placar[i,:] = campeonato(30)
+tempo = 100
+placares = np.zeros((30,tempo,3))
+for k in range(30):
+    politicas_rl = np.zeros((3**9,9))
+    politicas_rlq = np.zeros((3**9,9))
+
+    politicas_gd = np.zeros((3**9,9))
+    politicas_gdq = np.zeros((3**9,9))
+    placar = np.zeros((tempo,3))
+    for i in range(1,tempo):
+        placar[i,:] = campeonato(30)
+    placares[k,:,:] = placar
+
 
 d = np.array(range(tempo))
 dados = {'Vitorias':placar[:,0],'Derrotas':placar[:,2],'Empates':placar[:,1]}
 fig, ax = plt.subplots()
-
+dados2 = {'Vitorias':np.mean(placares[:,:,0], axis = 0),'Derrotas':np.mean(placares[:,:,2], axis = 0),'Empates':np.mean(placares[:,:,1], axis = 0)}
 ax.stackplot(d,dados.values(),labels = dados.keys(),alpha = 0.8)
 ax.legend(loc='upper left')
 ax.set_xlabel('Campeonatos')
 ax.set_ylabel('Proporção de resultados')
+
+fig, axs = plt.subplots()
+axs.stackplot(d,dados2.values(),labels = dados2.keys(),alpha = 0.8)
+axs.legend(loc='upper left')
+axs.set_xlabel('Campeonatos')
+axs.set_ylabel('Proporção media de resultados')
 
 plt.show()
 
